@@ -5,11 +5,15 @@ import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.charter.product.controller.ProductController;
 import com.charter.product.model.Product;
 import com.charter.product.repository.ProductRepository;
+import org.apache.log4j.Logger;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+	
+	private static final Logger logger = Logger.getLogger(ProductServiceImpl.class);
 	
 	public static final String EMPTY_STRING = "";
 	
@@ -18,12 +22,20 @@ public class ProductServiceImpl implements ProductService {
 
 	public Boolean isDiscounted(String productId) {
 		Product product = productRepository.findByProductId(productId);
+		if (product == null) {
+			logger.error("Product Id: " + productId + " not retrieved");
+			return null;
+		}
 		return product.getProductDiscounted();
 	}
 	
 	public String getAllProducts() {
 		StringBuilder rtn = new StringBuilder();
 		Iterable<Product> products = productRepository.findAll();
+		if (products == null) {
+			logger.error("Products not retrieved");
+			return "Products not retrieved";
+		}
 		products.forEach(prod -> rtn.append(formatProduct(prod)));
 		return rtn.toString();
 		
